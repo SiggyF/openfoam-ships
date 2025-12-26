@@ -1,0 +1,12 @@
+type            forces;
+libs            ("libforces.so");
+writeControl    timeStep;
+writeInterval   1;
+patches         (hull);
+rho             rhoInf;
+log             yes;
+rhoInf          1025;
+CofR            {{ parameters.CoM | default("(0 0 0)") }};
+pitchAxis       (0 1 0);
+dragDir         (1 0 0);
+liftDir         (0 0 1);

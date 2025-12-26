@@ -1,0 +1,83 @@
+Assuming unrestricted shared filesystem usage.
+host: Mac.fritz.box
+Building DAG of jobs...
+Using shell: /opt/local/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Job stats:
+job             count
+------------  -------
+all                 1
+prepare_case        2
+run_case            2
+visualize           2
+total               7
+
+Select jobs to execute...
+Execute 1 jobs...
+[Fri Dec 26 14:13:55 2025]
+localrule prepare_case:
+    input: cases/wigley/case.toml, workflows/scripts/prepare_case.py
+    output: build/wigley
+    jobid: 3
+    reason: Missing output files: build/wigley
+    wildcards: case_name=wigley
+    resources: tmpdir=/var/folders/gr/0j917nfx62x487fv_l35dkn40000gn/T
+[Fri Dec 26 14:13:55 2025]
+Finished jobid: 3 (Rule: prepare_case)
+1 of 7 steps (14%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Fri Dec 26 14:13:55 2025]
+localrule run_case:
+    input: build/wigley
+    output: results/wigley/log.interFoam, results/wigley/0.1
+    jobid: 2
+    reason: Missing output files: results/wigley/0.1, results/wigley/log.interFoam; Input files updated by another job: build/wigley
+    wildcards: case_name=wigley
+    resources: tmpdir=/var/folders/gr/0j917nfx62x487fv_l35dkn40000gn/T
+[Fri Dec 26 14:13:55 2025]
+Finished jobid: 2 (Rule: run_case)
+2 of 7 steps (29%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Fri Dec 26 14:13:55 2025]
+localrule visualize:
+    input: results/wigley/log.interFoam, results/wigley/0.1, workflows/scripts/visualize.py
+    output: results/wigley/visualization.png
+    jobid: 1
+    reason: Missing output files: results/wigley/visualization.png; Input files updated by another job: results/wigley/0.1, results/wigley/log.interFoam
+    wildcards: case_name=wigley
+    resources: tmpdir=/var/folders/gr/0j917nfx62x487fv_l35dkn40000gn/T
+Select jobs to execute...
+RuleException:
+CalledProcessError in file "/Users/baart_f/src/openfoam-ships/Snakefile", line 61:
+Command 'set -euo pipefail;  
+        uv run python workflows/scripts/visualize.py results/{case_name} $(dirname results/wigley/visualization.png)' returned non-zero exit status 2.
+[Fri Dec 26 14:14:32 2025]
+Error in rule visualize:
+    message: None
+    jobid: 1
+    input: results/wigley/log.interFoam, results/wigley/0.1, workflows/scripts/visualize.py
+    output: results/wigley/visualization.png
+    shell:
+        
+        uv run python workflows/scripts/visualize.py results/{case_name} $(dirname results/wigley/visualization.png)
+        
+        (command exited with non-zero exit code)
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look below for error messages
+[Fri Dec 26 14:14:32 2025]
+Error in rule visualize:
+    message: None
+    jobid: 1
+    input: results/wigley/log.interFoam, results/wigley/0.1, workflows/scripts/visualize.py
+    output: results/wigley/visualization.png
+    shell:
+        
+        uv run python workflows/scripts/visualize.py results/{case_name} $(dirname results/wigley/visualization.png)
+        
+        (command exited with non-zero exit code)
+Complete log(s): /Users/baart_f/src/openfoam-ships/.snakemake/log/2025-12-26T141354.466276.snakemake.log
+WorkflowError:
+At least one job did not complete successfully.

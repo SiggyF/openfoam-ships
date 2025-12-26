@@ -1,0 +1,44 @@
+type            sixDoFRigidBodyMotion;
+
+libs            ("libsixDoFRigidBodyMotion.so");
+
+solver
+{
+    type            Newmark;
+}
+
+diffusivity     uniform;
+
+patches         (hull);
+
+innerDistance   0.3;
+
+outerDistance   1.0;
+
+mass            {{ parameters.mass | default(100.0) }};
+
+centreOfMass    {{ parameters.CoM | default("(0 0 0)") }};
+
+momentOfInertia {{ parameters.MoI | default("(100 100 100)") }};
+
+g               (0 0 -9.81);
+
+report          on;
+
+reportToFile    on;
+
+solver
+{
+    type Newmark;
+}
+
+constraints
+{
+    // Example constraint: Lock Surge/Sway/Yaw
+    // maxDistance
+    // {
+    //    sixDoFRigidBodyMotionConstraint maxDistance;
+    //    centreOfRotation (0 0 0);
+    //    maxDistance 0.1;
+    // }
+}
