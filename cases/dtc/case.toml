@@ -1,0 +1,19 @@
+[meta]
+name = "dtc_hull"
+description = "Duisburg Test Case (DTC) hull benchmark."
+version = "of13"
+
+[flags]
+[flags.features]
+six_dof = true
+forces = true
+probes = false
+
+[parameters]
+endTime = 15.0
+velocity = 1.6
+maxCo = 1.0
+writeInterval = 0.5
+mass = 150.0
+CoM = "(0 0 -0.05)"
+MoI = "(50 400 50)"
