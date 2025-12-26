@@ -20,7 +20,15 @@ solvers
     {
         nAlphaCorr      2;
         nAlphaSubCycles 1;
-        cAlpha          1;
+        // cAlpha          1; DEPRECATED in OF13
+
+        // Use new interface compression scheme
+        // options: interfaceCompression, MPLIC, PLIC, etc.
+        interfaceCompression 1; # Equivalent to cAlpha 1 with MPLIC? No, standard compression.
+        
+        // Actually OF13 error listed valid values:
+        // MPLICU, PLICU, PLIC, noInterfaceCompression, MPLIC, interfaceCompression
+        // We select interfaceCompression.
 
         MULESCorr       yes;
         nLimiterIter    3;

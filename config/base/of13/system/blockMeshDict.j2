@@ -1,0 +1,111 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 1;
+
+{% set L = parameters.length | default(1.0) %}
+
+// Domain Size relative to Length
+// Upstream: 1.0*L
+// Downstream: 3.0*L
+// Side: 1.5*L
+// Depth: 1.0*L
+// Air: 0.5*L
+
+{% set xMin = -1.0 * L %}
+{% set xMax = 3.0 * L %}
+{% set yMin = -1.5 * L %}
+{% set yMax = 1.5 * L %}
+{% set zMin = -1.0 * L %}
+{% set zMax = 0.5 * L %}
+
+vertices
+(
+    ({{ xMin }} {{ yMin }} {{ zMin }})
+    ({{ xMax }} {{ yMin }} {{ zMin }})
+    ({{ xMax }} {{ yMax }} {{ zMin }})
+    ({{ xMin }} {{ yMax }} {{ zMin }})
+    ({{ xMin }} {{ yMin }} {{ zMax }})
+    ({{ xMax }} {{ yMin }} {{ zMax }})
+    ({{ xMax }} {{ yMax }} {{ zMax }})
+    ({{ xMin }} {{ yMax }} {{ zMax }})
+);
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7) ({{ parameters.nx | default(20) }} {{ parameters.ny | default(10) }} {{ parameters.nz | default(10) }}) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+    minX
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    maxX
+    {
+        type patch;
+        faces
+        (
+            (1 2 6 5)
+        );
+    }
+    minY
+    {
+        type symmetry;
+        faces
+        (
+            (0 1 5 4)
+        );
+    }
+    maxY
+    {
+        type symmetry;
+        faces
+        (
+            (3 7 6 2)
+        );
+    }
+    minZ
+    {
+        type patch;
+        faces
+        (
+            (0 3 2 1)
+        );
+    }
+    maxZ
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

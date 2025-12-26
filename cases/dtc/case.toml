@@ -17,3 +17,5 @@ writeInterval = 0.5
 mass = 150.0
 CoM = "(0 0 -0.05)"
 MoI = "(50 400 50)"
+scale = 0.01
+length = 3.0

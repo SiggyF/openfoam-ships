@@ -32,26 +32,35 @@ rule run_case:
     input:
         case_dir = BUILD_DIR / "{case_name}"
     output:
-        log = RESULTS_DIR / "{case_name}" / "log.interFoam",
-        dummy_time = directory(RESULTS_DIR / "{case_name}" / "0.1")
+        log = RESULTS_DIR / "{case_name}" / "log.interFoam"
     params:
-        image = "openfoam/openfoam13-graphical" 
+        image = "openfoam-ships:latest",
+        results_root = lambda wc: str(RESULTS_DIR / wc.case_name)
     shell:
         """
-        # Placeholder for Docker execution
-        # We simulate a run by creating a log and a dummy time directory
-        mkdir -p $(dirname {output.log})
-        echo "Starting simulation for {wildcards.case_name}" > {output.log}
-        echo "Using image {params.image}" >> {output.log}
+        # 1. Setup Results Directory
+        mkdir -p {params.results_root}
+        # Copy build files to results
+        cp -r {input.case_dir}/* {params.results_root}/
         
-        # Create dummy time dir for visualization sensing
-        mkdir -p {output.dummy_time}
+        # 2. Permission fix (ensure Docker can write)
+        chmod -R 777 {params.results_root}
+        
+        # 3. Run Docker
+        echo "Starting Docker simulation for {wildcards.case_name}..." > {output.log}
+        
+        # We use absolute paths for Docker volume
+        # Actually, simpler to just use $(pwd)/{params.results_root}
+        docker run --rm \
+            -v "$(pwd)/{params.results_root}:/home/openfoam/run/case" \
+            -w /home/openfoam/run/case \
+            {params.image} \
+            /bin/bash -c "ls -la && ./Allrun" >> {output.log} 2>&1 || true
         """
 
 rule visualize:
     input:
         log = RESULTS_DIR / "{case_name}" / "log.interFoam",
-        dummy_time = RESULTS_DIR / "{case_name}" / "0.1",
         script = "workflows/scripts/visualize.py"
     output:
         png = RESULTS_DIR / "{case_name}" / "visualization.png"

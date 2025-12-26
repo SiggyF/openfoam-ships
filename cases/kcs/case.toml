@@ -18,3 +18,5 @@ writeInterval = 0.5
 mass = 320.0 # Model scale mass
 CoM = "(0 0 0)"
 MoI = "(200 1000 200)"
+scale = 0.0227
+length = 7.27

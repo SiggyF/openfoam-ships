@@ -1,0 +1,43 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+sixDoF
+{
+    type            sixDoFRigidBodyMotion;
+    libs            ("libsixDoFRigidBodyMotion.so");
+    
+    patches         (hull);
+    innerDistance   0.3;
+    outerDistance   1.0;
+    
+    mass            {{ parameters.mass | default(1.0) }};
+    centreOfMass    {{ parameters.CoM | default("(0 0 0)") }};
+    momentOfInertia {{ parameters.MoI | default("(1 1 1)") }};
+    
+    rho             rhoInf;
+    rhoInf          1000;
+    
+    report          on;
+    accelerationRelaxation 0.7;
+    accelerationDamping    0.9;
+    
+    solver
+    {
+        type Newmark;
+    }
+    
+    constraints
+    {
+        // Add constraints if needed, e.g. fixed axes
+    }
+    
+    restraints
+    {
+        // Add restraints if needed
+    }
+}
+// ************************************************************************* //
