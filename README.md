@@ -28,6 +28,16 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
    uv run snakemake --cores all
    ```
 
+## Available Test Cases
+
+| Case | Description | Features | Geometry |
+| :--- | :--- | :--- | :--- |
+| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh` | None (Box) |
+| **`wigley`** | Wigley hull (L=1m) benchmark. | `sixDoF`, `snappyHexMesh` | Generated STL |
+| **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (proxy) |
+| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` |
+| **`series60`** | Series 60 Hull (L=2.4m). | `forces` | `barge.stl` (proxy) |
+
 ## Adding a New Case
 
 1. Create a new directory in `cases/`.

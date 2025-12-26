@@ -85,6 +85,57 @@ def prepare_case(toml_path: Path, output_dir: Path):
             # Remove the template file
             file_path.unlink()
             logging.info(f"Rendered template: {target_path.name}")
+    
+    # Copy Geometry if applicable
+    case_name = meta.get("name")
+    if case_name:
+        geometry_file = repo_root / "config" / "geometry" / f"{case_name}.stl"
+        if geometry_file.exists():
+            tri_surface_dir = output_dir / "constant" / "triSurface"
+            tri_surface_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(geometry_file, tri_surface_dir)
+            logging.info(f"Copied geometry file: {geometry_file.name}")
+
+    # Generate Allrun script
+    allrun_path = output_dir / "Allrun"
+    with open(allrun_path, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("# Source OpenFOAM environment if needed (handled by container usually)\n")
+        f.write("set -e\n") # Fail fast
+        
+        # Geometry Scaling
+        scale = parameters.get("scale")
+        if scale and case_name:
+             f.write(f"echo 'Scaling geometry by factor {scale}...'\n")
+             # New syntax: surfaceTransformPoints "scale=(x y z)" input output
+             # Note: quotes around the transformation string are important.
+             f.write(f"surfaceTransformPoints \"scale=({scale} {scale} {scale})\" constant/triSurface/{case_name}.stl constant/triSurface/{case_name}_scaled.stl > log.surfaceTransformPoints 2>&1\n")
+             f.write(f"mv constant/triSurface/{case_name}_scaled.stl constant/triSurface/{case_name}.stl\n")
+
+        f.write("echo 'Running blockMesh...'\n")
+        f.write("blockMesh > log.blockMesh 2>&1\n")
+        
+        # Check if snappyHexMeshDict exists
+        if (output_dir / "system" / "snappyHexMeshDict").exists():
+             if (output_dir / "system" / "surfaceFeaturesDict").exists():
+                 f.write("echo 'Running surfaceFeatures...'\n")
+                 f.write(f"surfaceFeatures > log.surfaceFeatures 2>&1\n")
+             elif (output_dir / "system" / "surfaceFeatureExtractDict").exists():
+                 # Legacy fallback
+                 f.write("echo 'Running surfaceFeatureExtract...'\n")
+                 f.write(f"surfaceFeatureExtract > log.surfaceFeatureExtract 2>&1\n")
+             
+             f.write("echo 'Running snappyHexMesh...'\n")
+             f.write(f"snappyHexMesh -overwrite > log.snappyHexMesh 2>&1\n")
+
+        # Placeholder for topoSet/snappyHexMesh if needed
+        # f.write("setFields > log.setFields 2>&1\n") # Need setup for setFields
+        f.write("echo 'Running interFoam...'\n")
+        f.write(f"interFoam > log.interFoam 2>&1\n")
+    
+    # Make executable
+    allrun_path.chmod(0o755)
+    logging.info(f"Created Allrun script at {allrun_path}")
 
     logging.info(f"Case preparation complete: {output_dir}")
 

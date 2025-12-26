@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  13
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh true;
+snap            true;
+addLayers       false;
+
+geometry
+{
+    hull
+    {
+        type triSurfaceMesh;
+        file "{{ meta.name }}.stl";
+    }
+}
+
+castellatedMeshControls
+{
+    maxLocalCells 100000;
+    maxGlobalCells 2000000;
+    minRefinementCells 10;
+    maxLoadUnbalance 0.10;
+    nCellsBetweenLevels 3;
+
+    features
+    (
+    );
+
+    refinementSurfaces
+    {
+        hull
+        {
+            level (2 2);
+        }
+    }
+
+    resolveFeatureAngle 30;
+
+    refinementRegions
+    {
+        hull
+        {
+            mode distance;
+            levels ((0.2 2) (0.5 1));
+        }
+    }
+
+    // Safe point in fluid (scaled by L)
+    // Domain extends to xMax = 3.0 * L
+    {% set L = parameters.length | default(1.0) %}
+    locationInMesh ({{ 1.5 * L }} {{ 1.0 * L }} {{ -0.5 * L }});
+    allowFreeStandingZoneFaces true;
+}
+
+snapControls
+{
+    nSmoothPatch 3;
+    tolerance 2.0;
+    nSolveIter 30;
+    nRelaxIter 5;
+    nFeatureSnapIter 10;
+    implicitFeatureSnap true;
+    explicitFeatureSnap false;
+    multiRegionFeatureSnap false;
+}
+
+addLayersControls
+{
+    relativeSizes true;
+    layers
+    {
+    }
+    expansionRatio 1.0;
+    finalLayerThickness 0.3;
+    minThickness 0.1;
+    nGrow 0;
+    featureAngle 60;
+    slipFeatureAngle 30;
+    nRelaxIter 3;
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals 3;
+    nSmoothThickness 10;
+    maxFaceThicknessRatio 0.5;
+    maxThicknessToMedialRatio 0.3;
+    minMedianAxisAngle 90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter 50;
+}
+
+meshQualityControls
+{
+    #include "meshQualityDict"
+}
+
+writeFlags
+(
+    scalarLevels
+    layerSets
+    layerFields
+);
+
+mergeTolerance 1e-6;
+
+// ************************************************************************* //

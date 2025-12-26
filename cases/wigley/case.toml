@@ -11,8 +11,11 @@ probes = false # Disable for now until configured
 
 [parameters]
 endTime = 10.0
+velocity = 1.0 # Fn=0.3? sqrt(g*L)*Fn -> sqrt(9.8*1)*0.3 ~ 0.93. 1.0 is fine.
 maxCo = 1.0
-writeInterval = 0.5
-mass = 200.0 # Approximate
-CoM = "(0 0 -0.0625)" # Draft is typically L/16 ~ 0.0625 for L=1
-MoI = "(10 100 10)"
+writeInterval = 0.1
+mass = 3.125 # Consistent with L=1.0, B=0.1, T=0.0625
+CoM = "(0 0 0)"
+MoI = "(1 1 1)" # Scaled down MoI
+scale = 1.0
+length = 1.0
