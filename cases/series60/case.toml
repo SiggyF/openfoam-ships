@@ -1,0 +1,19 @@
+[meta]
+name = "series60"
+description = "Series 60 (Cb=0.60) benchmark hull."
+version = "of13"
+
+[flags]
+[flags.features]
+six_dof = false
+forces = true
+probes = false
+
+[parameters]
+endTime = 10.0
+velocity = 1.0
+maxCo = 1.0
+writeInterval = 0.25
+mass = 80.0
+CoM = "(0 0 0)"
+MoI = "(10 80 10)"

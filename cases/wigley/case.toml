@@ -1,0 +1,18 @@
+[meta]
+name = "wigley_fixed"
+description = "Fixed Wigley hull resistance test."
+version = "of13"
+
+[flags]
+[flags.features]
+six_dof = false
+forces = true
+probes = false # Disable for now until configured
+
+[parameters]
+endTime = 10.0
+maxCo = 1.0
+writeInterval = 0.5
+mass = 200.0 # Approximate
+CoM = "(0 0 -0.0625)" # Draft is typically L/16 ~ 0.0625 for L=1
+MoI = "(10 100 10)"

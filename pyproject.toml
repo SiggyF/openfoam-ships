@@ -1,0 +1,14 @@
+[project]
+name = "openfoam-ships"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "click>=8.3.1",
+    "jinja2>=3.1.6",
+    "numpy>=2.4.0",
+    "pyvista>=0.46.4",
+    "snakemake>=9.14.5",
+    "toml>=0.10.2",
+]

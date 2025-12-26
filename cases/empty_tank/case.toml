@@ -1,0 +1,18 @@
+[meta]
+name = "empty_tank_01"
+description = "Basic empty tank test to check for stability without hull interaction."
+version = "of13"
+
+[flags]
+[flags.features]
+six_dof = false
+forces = false
+probes = false
+
+[parameters]
+endTime = 5.0
+maxCo = 0.5
+writeInterval = 0.5
+mass = 1.0 # arbitrary, unused
+CoM = "(0 0 0)"
+MoI = "(1 1 1)"

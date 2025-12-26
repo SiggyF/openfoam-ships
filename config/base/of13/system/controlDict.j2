@@ -1,0 +1,70 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2212                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     interFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         {{ parameters.endTime | default(10) }};
+
+deltaT          0.001;
+
+writeControl    adjustable;
+
+writeInterval   {{ parameters.writeInterval | default(0.1) }};
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           {{ parameters.maxCo | default(1.0) }};
+
+maxAlphaCo      {{ parameters.maxAlphaCo | default(1.0) }};
+
+maxDeltaT       1;
+
+functions
+{
+    {% if flags.features.six_dof %}
+    #include "sixDoF"
+    {% endif %}
+
+    {% if flags.features.forces %}
+    #include "forces"
+    {% endif %}
+    
+    {% if flags.features.probes %}
+    #include "probes"
+    {% endif %}
+}
+
+// ************************************************************************* //
