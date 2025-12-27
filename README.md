@@ -50,7 +50,7 @@ The following table summarizes the runtime performance of standard tutorials on 
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **DTCHull** | ESI (v2406) | 5s | 8s | 8 | Fast (LTS) |
 | **DTCHull** | Foundation (v13) | 5s | ~755s | 8 | |
-| **DTCHullMoving** | ESI (v2406) | 5s (Target) | *Running* | 8 | 120s limit |
+| **DTCHullMoving** | ESI (v2406) | 5s | 380s | 8 | Completed (ignored limit?) |
 | **DTCHullMoving** | Foundation (v13) | 5s (Target) | *Queued* | 8 | 120s limit |
 | **rigidBodyHull** | ESI (v2406) | 5s (Target) | *Queued* | 8 | 120s limit |
 | **DTCHullWave** | Foundation (v13) | 5s (Target) | *Queued* | 8 | 120s limit |
