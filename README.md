@@ -44,11 +44,16 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 ### Standard Tutorials (Benchmarks)
 We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.
 
-For detailed performance results and container usage, see [docker/README.md](docker/README.md).
+The following table summarizes the runtime performance of standard tutorials on a reference machine (e.g., Apple M1/M2/M3). Simulations were run for **5 seconds** of simulation time.
 
-**Key Benchmarks:**
-*   **Foundation (v13)**: `DTCHull`, `DTCHullMoving`, `DTCHullWave`
-*   **ESI (v2406)**: `DTCHull`, `DTCHullMoving`, `rigidBodyHull`
+| Tutorial Name | OpenFOAM Version | Simulation Time | Wall Clock Time | Cores | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **DTCHull** | ESI (v2406) | 5s | *Pending* | 1 | |
+| **DTCHull** | Foundation (v13) | 5s | ~755s | 8 | |
+| **DTCHullMoving** | ESI (v2406) | 5s | *Stopped* | 1 | |
+| **DTCHullMoving** | Foundation (v13) | 5s | *Incomplete* | 8 | Slow |
+| **rigidBodyHull** | ESI (v2406) | 5s | *Pending* | 1 | |
+| **DTCHullWave** | Foundation (v13) | 5s | *Pending* | 8 | |
 
 
 ## Adding a New Case

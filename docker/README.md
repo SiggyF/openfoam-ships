@@ -29,18 +29,6 @@ To minimize repository size, we follow these guidelines for geometry files:
 3.  **Runtime**: The `Allrun` script (or `Allmesh`) must handle copying or uncompressing these files to `constant/triSurface` as needed by `snappyHexMesh`.
 4.  **Exclusion**: Do not commit uncompressed STLs or generated mesh files (`polyMesh`, `extendedFeatureEdgeMesh`, etc.) to the repository.
 
-## Performance Benchmarks
-
-The following table summarizes the runtime performance of standard tutorials on a reference machine (e.g., Apple M1/M2/M3). Simulations were run for **5 seconds** of simulation time.
-
-| Tutorial Name | OpenFOAM Version | Simulation Time | Wall Clock Time | Cores | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **DTCHull** | ESI (v2406) | 5s | *Pending* | 1 | |
-| **DTCHull** | Foundation (v13) | 5s | ~755s | 8 | |
-| **DTCHullMoving** | ESI (v2406) | 5s | *Stopped* | 1 | |
-| **DTCHullMoving** | Foundation (v13) | 5s | *Incomplete* | 8 | Slow |
-| **rigidBodyHull** | ESI (v2406) | 5s | *Pending* | 1 | |
-| **DTCHullWave** | Foundation (v13) | 5s | *Pending* | 8 | |
 
 ## Running Containers
 
