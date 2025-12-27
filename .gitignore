@@ -165,3 +165,12 @@ __marimo__/
 latest.pkl
 results/
 .snakemake/
+
+# OpenFOAM Artifacts
+polyMesh/
+extendedFeatureEdgeMesh/
+processor*/
+postProcessing/
+log.*
+*.gz
+*.eMesh
