@@ -42,13 +42,14 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 *> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
 
 ### Standard Tutorials (Benchmarks)
-Analysis of standard OpenFOAM 13 tutorials (`incompressibleVoF/DTCHull*`) reveals significant differences in runtime and complexity:
+We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.
 
-| Tutorial Case | Physics | est. Runtime (5s Model Time) | Notes |
-| :--- | :--- | :--- | :--- |
-| **`DTCHull`** | Static (LTS) | ~6 mins | Steady-state convergence (fast). |
-| **`DTCHullMoving`** | 6DoF (Transient) | ~1 week | Extremely slow time steps (`~1e-4s`). |
-| **`DTCHullWave`** | Waves + 6DoF | ~1 week | Full VOF validation case. |
+For detailed performance results and container usage, see [docker/README.md](docker/README.md).
+
+**Key Benchmarks:**
+*   **Foundation (v13)**: `DTCHull`, `DTCHullMoving`, `DTCHullWave`
+*   **ESI (v2406)**: `DTCHull`, `DTCHullMoving`, `rigidBodyHull`
+
 
 ## Adding a New Case
 
