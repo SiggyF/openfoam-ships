@@ -46,19 +46,19 @@ We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (
 
 The following table summarizes the runtime performance of standard tutorials on a reference machine (e.g., Apple M1/M2/M3). Simulations were run for **5 seconds** of simulation time.
 
-| Tutorial Name | OpenFOAM Version | Simulated Time | Wall Clock Time | Extrapolated (5s) | Cores | Notes |
+| Tutorial Name | OpenFOAM Version | Simulated Time | Solver Wall Time | Extrapolated (5s) | Cores | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **DTCHull** | ESI (v2406) | 5.0s | 8s | 8s | 8 | Fast (LTS) |
 | **DTCHull** | Foundation (v13) | 5.0s | 11s | 11s | 8 | Fast (LTS) |
 | **DTCHullMoving** | ESI (v2406) | 5.0s | 380s | 380s | 8 | Completed |
-| **DTCHullMoving** | Foundation (v13) | 1.86s | 890s (Killed) | ~2400s | 8 | Slow (Limit failed) |
+| **DTCHullMoving** | Foundation (v13) | 1.86s | ~670s (Killed) | ~2400s | 8 | Slow (Limit failed) |
 | **rigidBodyHull** | ESI (v2406) | *Failed* | - | - | 5 | Config error (zones) |
-| **DTCHullWave** | Foundation (v13) | *Killed* | ~300s | - | 8 | Limits ignored, Meshing slow |
+| **DTCHullWave** | Foundation (v13) | *Killed* | N/A | - | 8 | Limits ignored, Meshing slow |
 
 > [!NOTE]
-> **Runtime Limits**: OpenFOAM 13 tutorials did **not** honor the `maxClockTime 120` constraint consistently. ESI `DTCHullMoving` also exceeded it slightly (380s) but completed.
-> **Mesh Dependencies**: OF13 tutorials (e.g., `DTCHullMoving`) failed to find pre-generated meshes from `DTCHull` due to Docker mount isolation.
-> **Reliability**: ESI tutorials showed better stability and script integration (except for the complex `rigidBodyHull` case).
+> **Runtime Limits**: The `maxClockTime` setting applies **only to the solver** (hydrodynamics), excluding meshing time.
+> **Limit Enforcement**: OpenFOAM 13 tutorials did not consistently honor this limit. ESI `DTCHullMoving` exceeded it (380s > 120s) but completed.
+> **Mesh Dependencies**: OF13 tutorials re-ran meshing due to Docker mount isolation, significantly increasing total script time, but this is excluded from the "Solver Wall Time" reported above.
 
 
 ## Adding a New Case
