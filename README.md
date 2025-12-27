@@ -52,7 +52,7 @@ The following table summarizes the runtime performance of standard tutorials on 
 | **DTCHull** | Foundation (v13) | 5.0s | 11s | 11s | 8 | Fast (LTS) |
 | **DTCHullMoving** | ESI (v2406) | 5.0s | 380s | 380s | 8 | Completed |
 | **DTCHullMoving** | Foundation (v13) | 1.86s | ~670s (Killed) | ~2400s | 8 | Slow (Limit failed) |
-| **rigidBodyHull** | ESI (v2406) | *Running* | - | - | 5 | Fix verified (geometry copy) |
+| **rigidBodyHull** | ESI (v2406) | 0.05s | ~360s (Killed) | ~36000s | 5 | Slow (Limit ineffective until writeInterval) |
 | **DTCHullWave** | Foundation (v13) | 0.02s | ~150s (Killed) | ~37500s | 8 | Limit ignored, extremely slow |
 
 > [!NOTE]

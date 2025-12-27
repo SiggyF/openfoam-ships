@@ -17,6 +17,7 @@ FoamFile
 libs            (overset rigidBodyDynamics);
 
 application     overInterDyMFoam;
+maxClockTime    120;
 
 startFrom       latestTime;
 
@@ -24,7 +25,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         5;
+endTime 5;
 
 deltaT          1e-5;
 
