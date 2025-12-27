@@ -6,10 +6,10 @@ This directory contains Dockerfiles and documentation for the OpenFOAM images us
 
 ### 1. Foundation (v13)
 *   **Dockerfile**: `openfoam13.Dockerfile`
-*   **Base Image**: `openfoam/openfoam13-graphical:latest`
+*   **Base Image**: `ubuntu:24.04`
 *   **Description**: Targeted for OpenFOAM Foundation version 13.
 *   **Usage**: Used for standard tutorials and main development.
-*   **User**: Runs as `openfoam` (uid=1000) by default. Environment is auto-loaded.
+*   **User**: Runs as `openfoam` (uid=1000) by default. Environment is auto-loaded via `BASH_ENV` and entrypoint.
 
 ### 2. ESI (v2406)
 *   **Dockerfile**: `openfoam2406.Dockerfile`
