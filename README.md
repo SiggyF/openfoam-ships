@@ -30,13 +30,16 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 
 ## Available Test Cases
 
-| Case | Description | Features | Geometry |
-| :--- | :--- | :--- | :--- |
-| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh` | None (Box) |
-| **`wigley`** | Wigley hull (L=1m) benchmark. | `sixDoF`, `snappyHexMesh` | Generated STL |
-| **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (proxy) |
-| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` |
-| **`series60`** | Series 60 Hull (L=2.4m). | `forces` | `barge.stl` (proxy) |
+| Case | Description | Features | Geometry Source | Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh` | None (Box) | N/A |
+| **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated (Math) | [Wigley (1942)](https://doi.org/10.5957/attc-1942-016) |
+| **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (Proxy*) | [el Moctar et al. (2012)](https://doi.org/10.1080/09377255.2012.701315) |
+| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
+| **`series60`** | Series 60 Hull (L=2.4m). | `forces` | `barge.stl` (Proxy*) | [Todd (1963)](https://apps.dtic.mil/sti/citations/AD0430632) |
+| **`DTCHullWave`** | Unmodified tutorial case. | `interFoam`, `wave` | `DTCHull.stl` | OpenFOAM Tutorial |
+
+*> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
 
 ## Adding a New Case
 
