@@ -48,12 +48,12 @@ The following table summarizes the runtime performance of standard tutorials on 
 
 | Tutorial Name | OpenFOAM Version | Simulation Time | Wall Clock Time | Cores | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DTCHull** | ESI (v2406) | 5s | *Pending* | 1 | |
+| **DTCHull** | ESI (v2406) | 5s | 8s | 8 | Fast (LTS) |
 | **DTCHull** | Foundation (v13) | 5s | ~755s | 8 | |
-| **DTCHullMoving** | ESI (v2406) | 5s | *Stopped* | 1 | |
-| **DTCHullMoving** | Foundation (v13) | 5s | *Incomplete* | 8 | Slow |
-| **rigidBodyHull** | ESI (v2406) | 5s | *Pending* | 1 | |
-| **DTCHullWave** | Foundation (v13) | 5s | *Pending* | 8 | |
+| **DTCHullMoving** | ESI (v2406) | 5s (Target) | *Running* | 8 | 120s limit |
+| **DTCHullMoving** | Foundation (v13) | 5s (Target) | *Queued* | 8 | 120s limit |
+| **rigidBodyHull** | ESI (v2406) | 5s (Target) | *Queued* | 8 | 120s limit |
+| **DTCHullWave** | Foundation (v13) | 5s (Target) | *Queued* | 8 | 120s limit |
 
 
 ## Adding a New Case
