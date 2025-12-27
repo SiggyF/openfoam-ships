@@ -1,0 +1,51 @@
+# OpenFOAM Docker Images
+
+This directory contains Dockerfiles and documentation for the OpenFOAM images used in this project.
+
+## Images
+
+### 1. Foundation (v13)
+*   **Dockerfile**: `openfoam13.Dockerfile`
+*   **Base Image**: `ubuntu:24.04`
+*   **Description**: Targeted for OpenFOAM Foundation version 13.
+*   **Usage**: Used for standard tutorials and main development.
+*   **User**: Runs as `openfoam` (uid=1000) by default. Environment is auto-loaded via `BASH_ENV` and entrypoint.
+
+### 2. ESI (v2406)
+*   **Dockerfile**: `openfoam2406.Dockerfile`
+*   **Base Image**: `opencfd/openfoam-default:2406`
+*   **Description**: Targeted for OpenFOAM ESI version v2406.
+*   **Usage**: Used for ESI-specific tutorials and benchmarks.
+*   **Particularities**:
+    *   **Default User**: Runs as `root` (uid=0) by default.
+    *   **Environment**: You must explicitly source the bashrc file: `source /usr/lib/openfoam/openfoam2406/etc/bashrc`.
+    *   **Non-Root Execution**: Can run as `ubuntu` (uid=1000) but requires permission management for mounted volumes.
+
+## Geometry Storage Policy
+
+To minimize repository size, we follow these guidelines for geometry files:
+1.  **Compression**: Always compress STL files using `gzip` (e.g., `hull.stl.gz`).
+2.  **Location**: specific geometry files should be stored in `constant/geometry` within the tutorial directory.
+3.  **Runtime**: The `Allrun` script (or `Allmesh`) must handle copying or uncompressing these files to `constant/triSurface` as needed by `snappyHexMesh`.
+4.  **Exclusion**: Do not commit uncompressed STLs or generated mesh files (`polyMesh`, `extendedFeatureEdgeMesh`, etc.) to the repository.
+
+
+## Running Containers
+
+### ESI (v2406)
+```bash
+docker run --rm \
+  -v $(pwd)/tutorials/esi/DTCHull:/data \
+  -w /data \
+  opencfd/openfoam-default:2406 \
+  bash -c 'source /usr/lib/openfoam/openfoam2406/etc/bashrc && ./Allrun'
+```
+
+### Foundation (v13)
+```bash
+docker run --rm \
+  -v $(pwd)/tutorials/of13/DTCHull:/home/openfoam/run/case \
+  -w /home/openfoam/run/case \
+  openfoam/openfoam13-graphical:latest \
+  ./Allrun
+```

@@ -15,12 +15,13 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 solver          incompressibleVoF;
+maxClockTime    120;
 
 startFrom       latestTime;
 
 startTime       0;
 
-stopAt          endTime;
+stopAt endTime;
 
 endTime 5;
 

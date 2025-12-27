@@ -42,13 +42,24 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 *> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
 
 ### Standard Tutorials (Benchmarks)
-Analysis of standard OpenFOAM 13 tutorials (`incompressibleVoF/DTCHull*`) reveals significant differences in runtime and complexity:
+We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.
 
-| Tutorial Case | Physics | est. Runtime (5s Model Time) | Notes |
-| :--- | :--- | :--- | :--- |
-| **`DTCHull`** | Static (LTS) | ~6 mins | Steady-state convergence (fast). |
-| **`DTCHullMoving`** | 6DoF (Transient) | ~1 week | Extremely slow time steps (`~1e-4s`). |
-| **`DTCHullWave`** | Waves + 6DoF | ~1 week | Full VOF validation case. |
+The following table summarizes the runtime performance of standard tutorials on a reference machine (e.g., Apple M1/M2/M3). Simulations were run for **5 seconds** of simulation time.
+
+| Tutorial Name | OpenFOAM Version | Simulated Time | Solver Wall Time | Extrapolated (5s) | Cores | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DTCHull** | ESI (v2406) | 5.0s | 8s | 8s | 8 | Fast (LTS) |
+| **DTCHull** | Foundation (v13) | 5.0s | 11s | 11s | 8 | Fast (LTS) |
+| **DTCHullMoving** | ESI (v2406) | 5.0s | 380s | 380s | 8 | Completed |
+| **DTCHullMoving** | Foundation (v13) | 1.86s | ~670s (Killed) | ~2400s | 8 | Slow (Limit failed) |
+| **rigidBodyHull** | ESI (v2406) | 0.05s | ~360s (Killed) | ~36000s | 5 | Slow (Limit ineffective until writeInterval) |
+| **DTCHullWave** | Foundation (v13) | 0.02s | ~150s (Killed) | ~37500s | 8 | Limit ignored, extremely slow |
+
+> [!NOTE]
+> **Runtime Limits**: The `maxClockTime` setting applies **only to the solver** (hydrodynamics), excluding meshing time.
+> **Limit Enforcement**: OpenFOAM 13 tutorials did not consistently honor this limit. ESI `DTCHullMoving` exceeded it (380s > 120s) but completed.
+> **Mesh Dependencies**: OF13 tutorials re-ran meshing due to Docker mount isolation, significantly increasing total script time, but this is excluded from the "Solver Wall Time" reported above.
+
 
 ## Adding a New Case
 

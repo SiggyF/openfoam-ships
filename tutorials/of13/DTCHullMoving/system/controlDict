@@ -20,7 +20,7 @@ startFrom       startTime;
 
 startTime       0;
 
-stopAt          endTime;
+stopAt endTime;
 
 endTime 5;
 

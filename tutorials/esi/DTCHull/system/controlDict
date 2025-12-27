@@ -15,12 +15,13 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 application     interFoam;
+maxClockTime 120;
 
 startFrom       startTime;
 
 startTime       0;
 
-stopAt          endTime;
+stopAt endTime;
 
 endTime 5;
 

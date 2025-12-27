@@ -5,9 +5,9 @@ cd "${0%/*}" || exit                                # Run from this directory
 
 mkdir -p constant/triSurface
 
-cp -f \
-    "$FOAM_TUTORIALS"/resources/geometry/rigidBodyHull/{BLADES,HUB,MRF_REGION}.obj.gz \
-    constant/triSurface/
+cp -f "$FOAM_TUTORIALS"/resources/geometry/rigidBodyHull/BLADES.obj.gz constant/triSurface/
+cp -f "$FOAM_TUTORIALS"/resources/geometry/rigidBodyHull/HUB.obj.gz constant/triSurface/
+cp -f "$FOAM_TUTORIALS"/resources/geometry/rigidBodyHull/MRF_REGION.obj.gz constant/triSurface/
 
 runApplication blockMesh
 
