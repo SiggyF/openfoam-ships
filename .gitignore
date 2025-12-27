@@ -174,3 +174,14 @@ postProcessing/
 log.*
 *.gz
 *.eMesh
+
+# Generated time directories
+[0-9]*/
+!0.orig/
+time/
+*.log
+tutorials/**/log.*
+tutorials/**/benchmark*.log
+# Specific cleanup to avoid accidentally committing large results
+tutorials/*/DTCHull*/[0-9]*/
+tutorials/*/rigidBodyHull*/[0-9]*/

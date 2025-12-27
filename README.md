@@ -52,8 +52,8 @@ The following table summarizes the runtime performance of standard tutorials on 
 | **DTCHull** | Foundation (v13) | 5.0s | 11s | 11s | 8 | Fast (LTS) |
 | **DTCHullMoving** | ESI (v2406) | 5.0s | 380s | 380s | 8 | Completed |
 | **DTCHullMoving** | Foundation (v13) | 1.86s | ~670s (Killed) | ~2400s | 8 | Slow (Limit failed) |
-| **rigidBodyHull** | ESI (v2406) | *Failed* | - | - | 5 | Config error (zones) |
-| **DTCHullWave** | Foundation (v13) | *Killed* | N/A | - | 8 | Limits ignored, Meshing slow |
+| **rigidBodyHull** | ESI (v2406) | *Running* | - | - | 5 | Fix verified (geometry copy) |
+| **DTCHullWave** | Foundation (v13) | 0.02s | ~150s (Killed) | ~37500s | 8 | Limit ignored, extremely slow |
 
 > [!NOTE]
 > **Runtime Limits**: The `maxClockTime` setting applies **only to the solver** (hydrodynamics), excluding meshing time.
