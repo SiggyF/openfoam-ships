@@ -1,0 +1,59 @@
+{% set foam_class = 'dictionary' %}
+{% set foam_object = 'controlDict' %}
+{% include 'header.j2' %}
+
+application     interFoam;
+maxClockTime    {{ parameters.get('maxClockTime', 120) }};
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         {{ parameters.get('endTime', 5) }};
+
+deltaT          {{ parameters.get('deltaT', 0.001) }};
+
+writeControl    {{ parameters.get('writeControl', 'adjustableRunTime') }};
+
+writeInterval   {{ parameters.get('writeInterval', 0.1) }};
+
+purgeWrite      0;
+
+writeFormat     binary;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo           {{ parameters.get('maxCo', 0.9) }};
+maxAlphaCo      {{ parameters.get('maxAlphaCo', 2.0) }};
+maxDeltaT       {{ parameters.get('maxDeltaT', 1.0) }};
+
+functions
+{
+{% if flags.get('features', {}).get('forces', True) %}
+    forces
+    {
+        type            forces;
+        libs            ("libforces.so");
+        patches         (hull);
+        rhoInf          998.8;
+        log             on;
+        writeControl    timeStep;
+        writeInterval   1;
+        CofR            (2.929541 0 0.2);
+    }
+{% endif %}
+}
+
+// ************************************************************************* //

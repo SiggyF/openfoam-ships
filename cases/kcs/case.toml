@@ -1,5 +1,8 @@
 [meta]
 name = "kcs_hull"
+# base_tutorial removed, using templates/base + features
+
+
 description = "KRISO Container Ship (KCS) resistance test."
 version = "of13"
 
@@ -10,12 +13,12 @@ forces = true
 probes = true
 
 [parameters]
-endTime = 20.0
+endTime = 20.0 # (Base: 5.0)
 # KCS Length ~ 230m, but usually scaled. Assuming model scale L=7.2786m (typical)
-velocity = 2.196 # Froude 0.26
-maxCo = 0.8
+velocity = 2.196 # (Base: 1.668) Froude 0.26
+maxCo = 0.8 # (Base: Undefined/Fixed)
 writeInterval = 0.5
-mass = 320.0 # Model scale mass
+mass = 320.0 # (Base: N/A)
 CoM = "(0 0 0)"
 MoI = "(200 1000 200)"
 scale = 0.0227

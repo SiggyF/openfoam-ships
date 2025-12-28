@@ -1,0 +1,64 @@
+#!/bin/bash
+set -e
+
+# Restoring 0 directory (Initial)
+{% if has_0_orig %}
+echo 'Restoring 0 directory...'
+rm -rf 0
+cp -r 0.orig 0
+{% endif %}
+
+# Scale Geometry
+{% if scale %}
+echo 'Scaling geometry by factor {{ scale }}...'
+surfaceTransformPoints "scale=({{ scale }} {{ scale }} {{ scale }})" constant/triSurface/{{ case_name }}.stl constant/triSurface/{{ case_name }}_scaled.stl > log.surfaceTransformPoints 2>&1
+mv constant/triSurface/{{ case_name }}_scaled.stl constant/triSurface/{{ case_name }}.stl
+{% endif %}
+
+# BlockMesh
+{% if has_block_mesh %}
+echo 'Running blockMesh...'
+blockMesh > log.blockMesh 2>&1
+{% endif %}
+
+# Meshing (Surface Features + Snappy)
+{% if has_snappy %}
+# Surface Features
+{% if has_surface_features %}
+echo 'Running surfaceFeatures...'
+surfaceFeatures > log.surfaceFeatures 2>&1
+{% elif has_surface_feature_extract %}
+echo 'Running surfaceFeatureExtract...'
+surfaceFeatureExtract > log.surfaceFeatureExtract 2>&1
+{% endif %}
+
+echo 'Running snappyHexMesh...'
+snappyHexMesh -overwrite > log.snappyHexMesh 2>&1
+
+# Restore 0 directory (Post-Meshing) to ensure fields match new mesh
+{% if has_0_orig %}
+echo 'Restoring 0 directory after meshing...'
+rm -rf 0
+cp -r 0.orig 0
+{% endif %}
+{% endif %}
+
+# SetFields
+{% if has_set_fields %}
+echo 'Running setFields...'
+setFields > log.setFields 2>&1
+{% endif %}
+
+# Solver Execution
+{% if has_decompose %}
+echo 'Running decomposePar...'
+decomposePar > log.decomposePar 2>&1
+echo 'Running interFoam (parallel)...'
+nProcs=$(grep 'numberOfSubdomains' system/decomposeParDict | tr -cd '0-9')
+mpirun -np $nProcs interFoam -parallel > log.interFoam 2>&1
+echo 'Running reconstructPar...'
+reconstructPar > log.reconstructPar 2>&1
+{% else %}
+echo 'Running interFoam...'
+interFoam > log.interFoam 2>&1
+{% endif %}

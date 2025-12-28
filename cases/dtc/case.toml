@@ -1,5 +1,8 @@
 [meta]
 name = "dtc_hull"
+# base_tutorial removed, using templates/base + features
+
+
 description = "Duisburg Test Case (DTC) hull benchmark."
 version = "of13"
 
@@ -10,12 +13,12 @@ forces = true
 probes = false
 
 [parameters]
-endTime = 15.0
-velocity = 1.6
-maxCo = 1.0
+endTime = 15.0 # (Base: 5.0) Extended for stability verification
+velocity = 1.668 # (Base: 1.668)
+maxCo = 25.0 # (Base: 25.0)
 writeInterval = 0.5
-mass = 150.0
-CoM = "(0 0 -0.05)"
-MoI = "(50 400 50)"
-scale = 0.01
+mass = 412.73 # (Base: 412.73)
+CoM = "(0 0 0)" # (Base: 0,0,0) - Centre of Mass in dynamicMeshDict
+MoI = "(40 921 921)" # (Base: 40 0 0 921 0 921 -> diagonal roughly)
+scale = 1.0 # (Base: Already scaled in STL?)
 length = 3.0
