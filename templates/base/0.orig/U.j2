@@ -1,0 +1,44 @@
+{% set foam_class = 'volVectorField' %}
+{% set foam_object = 'U' %}
+{% include 'header.j2' %}
+
+Umean           {{ parameters.get('velocity', 1.668) }};
+mUmean          -{{ parameters.get('velocity', 1.668) }};
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform ($mUmean 0 0);
+
+boundaryField
+{
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    inlet
+    {
+        type            fixedValue;
+        value           $internalField;
+    }
+
+    outlet
+    {
+        type            outletPhaseMeanVelocity;
+        alpha           alpha.water;
+        Umean           $Umean;
+        UnMean          $Umean;
+        value           $internalField;
+    }
+
+    atmosphere
+    {
+        type            pressureInletOutletVelocity;
+        value           uniform (0 0 0);
+    }
+
+    hull
+    {
+        type            movingWallVelocity;
+        value           uniform (0 0 0);
+    }
+}
+
+// ************************************************************************* //

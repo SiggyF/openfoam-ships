@@ -5,6 +5,7 @@ import click
 import logging
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -16,19 +17,9 @@ def prepare_case(toml_path: Path, output_dir: Path):
     """
     Prepare an OpenFOAM case directory based on a TOML configuration.
     """
-    # Fail early is implicit with click.Path(exists=True) for toml_path,
-    # but let's be explicit about loading valid TOML
     try:
         config = toml.load(toml_path)
     except Exception as e:
-        # We catch here only to provide context, but re-raise is cleaner for python guideline compliance?
-        # The guideline says "Fail early... allow exceptions to propagate".
-        # But for CLI entry points, it is sometimes nicer to crash with a message.
-        # However, complying with "Fail early... allow propagation", we might want to just let it crash.
-        # But `toml.load` failing is a data error, so maybe just let it bubble.
-        # Let's let it bubble to be strictly compliant, OR just re-raise.
-        # But this block was already here. I will leave the try/except but ensure it uses logging if we were printing.
-        # The current code raises RuntimeError. That's fine.
         raise RuntimeError(f"Failed to parse TOML file at {toml_path}: {e}")
 
     meta = config.get("meta", {})
@@ -36,106 +27,188 @@ def prepare_case(toml_path: Path, output_dir: Path):
     flags = config.get("flags", {})
     parameters = config.get("parameters", {})
     
+    case_name = meta.get("name")
+    
     logging.info(f"Preparing case '{meta.get('name', 'unnamed')}' for OpenFOAM {version}")
     
     # Define source paths
     repo_root = Path(__file__).resolve().parent.parent.parent
-    base_config_root = repo_root / "config" / "base" / version
+    templates_root = repo_root / "templates"
     
-    if not base_config_root.exists():
-        raise FileNotFoundError(f"Base configuration for version '{version}' not found at {base_config_root}")
-        
     # Clean output directory if exists
     if output_dir.exists():
         shutil.rmtree(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Copy structure from Base
-    for folder in ["system", "constant", "0"]:
-        src = base_config_root / folder
-        dst = output_dir / folder
-        if src.exists():
-            shutil.copytree(src, dst)
-            
+    # 1. Apply Base Template
+    base_template = templates_root / "base"
+    if not base_template.exists():
+         raise FileNotFoundError(f"Base template not found at {base_template}")
+    
+    logging.info(f"Applying base template from {base_template}")
+    
+    # Ignore build artifacts
+    ignore_func = shutil.ignore_patterns("log.*", "processor*", "postProcessing", "*.foam", "dynamicCode")
+    shutil.copytree(base_template, output_dir, ignore=ignore_func)
+    
+    # 2. Apply Features
+    features = flags.get("features", {})
+    
+    # Feature: Six DoF
+    if features.get("six_dof"):
+        feature_path = templates_root / "features" / "six_dof"
+        if feature_path.exists():
+            logging.info("Applying feature: six_dof")
+            shutil.copytree(feature_path, output_dir, dirs_exist_ok=True)
+        else:
+            logging.warning(f"Feature six_dof requested but template not found at {feature_path}")
+
+    # --- Patching Logic (Applied to the composed case) ---
+    
+    # Patching Logic (Applied to the composed case)
+    # Most dicts are now handled via Jinja2 templates (see .j2 files in templates/)
+    # - snappyHexMeshDict.j2
+    # - fvSolution.j2
+    # - fvSchemes.j2
+    # - decomposeParDict.j2
+    # - U.j2
+    
+    # Generate surfaceFeaturesDict (OF13 compatibility)
+    surf_feat_template_path = templates_root / "scripts" / "surfaceFeaturesDict.template"
+    if surf_feat_template_path.exists() and case_name:
+        with open(surf_feat_template_path, "r") as f:
+            template_content = f.read()
+        
+        rendered = template_content.replace("{stl_filename}", f"{case_name}.stl")
+        
+        surf_feat_dict = output_dir / "system" / "surfaceFeaturesDict"
+        with open(surf_feat_dict, "w") as f:
+            f.write(rendered)
+        logging.info(f"Generated surfaceFeaturesDict from template")
+
+    # Remove legacy dict
+    legacy_dict = output_dir / "system" / "surfaceFeatureExtractDict"
+    if legacy_dict.exists():
+        legacy_dict.unlink()
+
+    # Patch controlDict (Handling moved to templates/base/system/controlDict.j2)
+    pass
+
+    # Patch dynamicMeshDict
+    dyn_mesh_dict = output_dir / "constant" / "dynamicMeshDict"
+    # Placeholder for mass property injection if we implement it dynamically
+    # For now, we rely on the template or manual edits, but could inject mass/CoM here.
+    
+    # Patch fvSolution (Moved to template)
+    pass
+
+    # Patch fvSchemes (Moved to template)
+    pass
+
+    # Patch turbulenceProperties -> momentumTransport
+    turb_props = output_dir / "constant" / "turbulenceProperties"
+    mom_transport = output_dir / "constant" / "momentumTransport"
+    if turb_props.exists() and not mom_transport.exists():
+        turb_props.rename(mom_transport)
+        logging.info("Renamed turbulenceProperties -> momentumTransport for OF13 compatibility")
+
+    # Patch decomposeParDict (Moved to template)
+    pass
+
+    # Patch 0/U (Moved to template)
+    pass
+
+    # Patch Allrun (Legacy patching removed - Logic handled by Allrun.j2 template)
+    pass
+
+    # Clean numbered directories
+    for item in output_dir.iterdir():
+        if item.is_dir() and item.name.isdigit():
+             if item.name == "0": continue
+             shutil.rmtree(item)
+
     # Template Processing
-    for root, dirs, files in os.walk(output_dir):
-        for file in files:
-            if not file.endswith(".j2"):
-                continue
-
-            file_path = Path(root) / file
-            target_path = file_path.with_suffix("") 
-            
-            # Setup Jinja environment for this file's folder (to allow includes relative to it)
-            # But mostly we just want to pass our flags
-            env = Environment(loader=FileSystemLoader(root))
-            # Add a strict undefined handler if we wanted to enforce all vars are present
-            # env.undefined = jinja2.StrictUndefined 
-            
-            template = env.get_template(file)
-            rendered_content = template.render(
-                flags=flags, 
-                parameters=parameters,
-                meta=meta
-            )
-            
-            with open(target_path, "w") as f:
-                f.write(rendered_content)
-            
-            # Remove the template file
+    for file_path in output_dir.rglob("*.j2"):
+        if file_path.name == "header.j2":
             file_path.unlink()
-            logging.info(f"Rendered template: {target_path.name}")
-    
-    # Copy Geometry if applicable
-    case_name = meta.get("name")
-    if case_name:
-        geometry_file = repo_root / "config" / "geometry" / f"{case_name}.stl"
-        if geometry_file.exists():
-            tri_surface_dir = output_dir / "constant" / "triSurface"
-            tri_surface_dir.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(geometry_file, tri_surface_dir)
-            logging.info(f"Copied geometry file: {geometry_file.name}")
+            continue
 
-    # Generate Allrun script
+        target_path = file_path.with_suffix("") 
+        
+        # Jinja2 requires a str path for loader
+        # We add the file's parent AND templates/base to allow including common templates like header.j2
+        search_paths = [str(file_path.parent), str(templates_root / "base")]
+        env = Environment(loader=FileSystemLoader(search_paths))
+        template = env.get_template(file_path.name)
+        rendered_content = template.render(
+            flags=flags, 
+            parameters=parameters, 
+            meta=meta, 
+            case_name=case_name,
+            version=version
+        )
+        
+        with open(target_path, "w") as f:
+            f.write(rendered_content)
+        
+        file_path.unlink()
+        logging.info(f"Rendered template: {target_path.name}")
+    
+    # Geometry Handling
+    geometry_dir = output_dir / "constant" / "triSurface"
+    geometry_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Check for compressed or uncompressed source
+    source_stl = toml_path.parent / f"{case_name}.stl"
+    source_stl_gz = toml_path.parent / f"{case_name}.stl.gz"
+    
+    # Fallback to config/geometry if not in case dir
+    if not source_stl.exists() and not source_stl_gz.exists():
+         source_stl = repo_root / "config" / "geometry" / f"{case_name}.stl"
+         source_stl_gz = repo_root / "config" / "geometry" / f"{case_name}.stl.gz"
+
+    target_stl = geometry_dir / f"{case_name}.stl"
+
+    if source_stl.exists():
+        shutil.copy(source_stl, target_stl)
+        logging.info(f"Copied geometry file: {source_stl.name}")
+    elif source_stl_gz.exists():
+        import gzip
+        with gzip.open(source_stl_gz, 'rb') as f_in:
+            with open(target_stl, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        logging.info(f"Copied and decompressed geometry file: {source_stl_gz.name}")
+    else:
+        logging.warning(f"Geometry file for {case_name} not found in case dir or config/geometry.")
+    
+    # Generate Allrun script (Jinja2 template based)
     allrun_path = output_dir / "Allrun"
-    with open(allrun_path, "w") as f:
-        f.write("#!/bin/bash\n")
-        f.write("# Source OpenFOAM environment if needed (handled by container usually)\n")
-        f.write("set -e\n") # Fail fast
-        
-        # Geometry Scaling
-        scale = parameters.get("scale")
-        if scale and case_name:
-             f.write(f"echo 'Scaling geometry by factor {scale}...'\n")
-             # New syntax: surfaceTransformPoints "scale=(x y z)" input output
-             # Note: quotes around the transformation string are important.
-             f.write(f"surfaceTransformPoints \"scale=({scale} {scale} {scale})\" constant/triSurface/{case_name}.stl constant/triSurface/{case_name}_scaled.stl > log.surfaceTransformPoints 2>&1\n")
-             f.write(f"mv constant/triSurface/{case_name}_scaled.stl constant/triSurface/{case_name}.stl\n")
-
-        f.write("echo 'Running blockMesh...'\n")
-        f.write("blockMesh > log.blockMesh 2>&1\n")
-        
-        # Check if snappyHexMeshDict exists
-        if (output_dir / "system" / "snappyHexMeshDict").exists():
-             if (output_dir / "system" / "surfaceFeaturesDict").exists():
-                 f.write("echo 'Running surfaceFeatures...'\n")
-                 f.write(f"surfaceFeatures > log.surfaceFeatures 2>&1\n")
-             elif (output_dir / "system" / "surfaceFeatureExtractDict").exists():
-                 # Legacy fallback
-                 f.write("echo 'Running surfaceFeatureExtract...'\n")
-                 f.write(f"surfaceFeatureExtract > log.surfaceFeatureExtract 2>&1\n")
-             
-             f.write("echo 'Running snappyHexMesh...'\n")
-             f.write(f"snappyHexMesh -overwrite > log.snappyHexMesh 2>&1\n")
-
-        # Placeholder for topoSet/snappyHexMesh if needed
-        # f.write("setFields > log.setFields 2>&1\n") # Need setup for setFields
-        f.write("echo 'Running interFoam...'\n")
-        f.write(f"interFoam > log.interFoam 2>&1\n")
+    allrun_template_path = templates_root / "scripts" / "Allrun.j2"
     
-    # Make executable
-    allrun_path.chmod(0o755)
-    logging.info(f"Created Allrun script at {allrun_path}")
+    if not allrun_path.exists() and allrun_template_path.exists():
+        with open(allrun_template_path, "r") as f:
+            template_content = f.read()
+            
+        template = Environment(loader=FileSystemLoader(allrun_template_path.parent)).from_string(template_content)
+
+        # Prepare Context
+        context = {
+            "case_name": case_name,
+            "scale": parameters.get("scale"),
+            "has_0_orig": (output_dir / "0.orig").exists(),
+            "has_block_mesh": (output_dir / "system" / "blockMeshDict").exists(),
+            "has_snappy": (output_dir / "system" / "snappyHexMeshDict").exists(),
+            "has_surface_features": (output_dir / "system" / "surfaceFeaturesDict").exists(),
+            "has_surface_feature_extract": (output_dir / "system" / "surfaceFeatureExtractDict").exists(),
+            "has_set_fields": (output_dir / "system" / "setFieldsDict").exists(),
+            "has_decompose": (output_dir / "system" / "decomposeParDict").exists()
+        }
+
+        rendered_allrun = template.render(context)
+
+        with open(allrun_path, "w") as f:
+            f.write(rendered_allrun)
+        allrun_path.chmod(0o755)
+        logging.info(f"Created Allrun script from template at {allrun_path}")
 
     logging.info(f"Case preparation complete: {output_dir}")
 

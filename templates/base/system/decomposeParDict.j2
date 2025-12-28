@@ -1,0 +1,15 @@
+{% set foam_class = 'dictionary' %}
+{% set foam_object = 'decomposeParDict' %}
+{% include 'header.j2' %}
+
+numberOfSubdomains 8;
+
+method             hierarchical;
+
+hierarchicalCoeffs
+{
+    n           (2 2 2);
+    order       xyz;
+}
+
+// ************************************************************************* //
