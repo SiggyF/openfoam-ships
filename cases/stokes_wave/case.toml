@@ -1,0 +1,21 @@
+[meta]
+name = "stokes_wave"
+description = "Stokes I wave simulation based on ESI tutorial."
+version = "v2406"
+
+[flags]
+[flags.features]
+six_dof = false
+forces = false
+probes = false
+meshing = false
+waves = true
+
+[parameters]
+endTime = 10.0
+maxCo = 0.65
+maxAlphaCo = 0.65
+writeInterval = 0.5
+mass = 1.0
+CoM = "(0 0 0)"
+MoI = "(1 1 1)"

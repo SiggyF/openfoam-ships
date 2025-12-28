@@ -32,7 +32,8 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 
 | Case | Description | Features | Geometry Source | Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh` | None (Box) | N/A |
+| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh`, `no-mesh` | None (Box) | N/A |
+| **`stokes_wave`** | ESI tutorial-based wave test. | `interFoam`, `waves` | None (Box) | Stokes I Theory |
 | **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated (Math) | [Wigley (1942)](https://doi.org/10.5957/attc-1942-016) |
 | **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (Proxy*) | [el Moctar et al. (2012)](https://doi.org/10.1080/09377255.2012.701315) |
 | **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |

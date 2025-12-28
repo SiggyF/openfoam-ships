@@ -74,7 +74,7 @@ def prepare_case(toml_path: Path, output_dir: Path):
     
     # Generate surfaceFeaturesDict (OF13 compatibility)
     surf_feat_template_path = templates_root / "scripts" / "surfaceFeaturesDict.template"
-    if surf_feat_template_path.exists() and case_name:
+    if surf_feat_template_path.exists() and case_name and features.get("meshing", True):
         with open(surf_feat_template_path, "r") as f:
             template_content = f.read()
         
@@ -138,6 +138,10 @@ def prepare_case(toml_path: Path, output_dir: Path):
         # We add the file's parent AND templates/base to allow including common templates like header.j2
         search_paths = [str(file_path.parent), str(templates_root / "base")]
         env = Environment(loader=FileSystemLoader(search_paths))
+        if file_path.name == "snappyHexMeshDict.j2" and not features.get("meshing", True):
+             file_path.unlink()
+             continue
+
         template = env.get_template(file_path.name)
         rendered_content = template.render(
             flags=flags, 
