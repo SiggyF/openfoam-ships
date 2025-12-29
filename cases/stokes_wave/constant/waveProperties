@@ -1,0 +1,38 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      waveProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+origin          (0 0 0.45);
+direction       (1 0 0);
+
+waves
+(
+    Stokes2
+    {
+        period      3.0;
+        amplitude   0.025;
+        phase       0;
+        angle       0;
+    }
+);
+
+UxMean          0.0;
+UMean           (0 0 0);
+
+// Ramp time 3.0s
+scale           table ((0 0) (3 1) (100 1));
+crossFlow       false;
+// ************************************************************************* //
