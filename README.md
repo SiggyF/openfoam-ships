@@ -32,7 +32,8 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 
 | Case | Description | Features | Geometry Source | Reference |
 | :--- | :--- | :--- | :--- | :--- |
-| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh` | None (Box) | N/A |
+| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh`, `no-mesh` | None (Box) | N/A |
+| **`stokes_wave`** | ESI tutorial-based wave test. | `interFoam`, `waves` | None (Box) | Stokes I Theory |
 | **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated (Math) | [Wigley (1942)](https://doi.org/10.5957/attc-1942-016) |
 | **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (Proxy*) | [el Moctar et al. (2012)](https://doi.org/10.1080/09377255.2012.701315) |
 | **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
@@ -40,6 +41,11 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 | **`DTCHullWave`** | Unmodified tutorial case. | `interFoam`, `wave` | `DTCHull.stl` | OpenFOAM Tutorial |
 
 *> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
+
+### Verification Strategy
+For local verification on standard hardware, we utilize **reduced mesh refinement levels** (Level 2-3) compared to production HPC runs. This keeps cell counts manageable (~100k-300k) and allows for rapid feedback cycles (<10 minutes).
+- `wigley`: ~100k cells (Level 2/3)
+- `dtc`: ~200k cells (Level 2) - **Note**: Standard tutorials may use coarser or finer meshes; Level 2 is chosen for a balance of speed and 6DoF stability.
 
 ### Standard Tutorials (Benchmarks)
 We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.

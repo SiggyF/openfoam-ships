@@ -185,3 +185,9 @@ tutorials/**/benchmark*.log
 # Specific cleanup to avoid accidentally committing large results
 tutorials/*/DTCHull*/[0-9]*/
 tutorials/*/rigidBodyHull*/[0-9]*/
+tutorials/*/waves*/[0-9]*/
+tutorials/*/wave*/[0-9]*/
+tutorials/*/*/processor*/
+tutorials/*/*/postProcessing/
+cases/**/waveProperties # If generated or large
+

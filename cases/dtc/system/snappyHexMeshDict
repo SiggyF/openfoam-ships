@@ -1,0 +1,97 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      snappyHexMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+castellatedMesh true;
+snap            true;
+addLayers       false; // Disable layers for speed in verification
+
+geometry
+{
+    "dtc_hull.stl"
+    {
+        type triSurfaceMesh;
+        file "dtc_hull.stl";
+        name hull;
+    }
+}
+
+castellatedMeshControls
+{
+    maxLocalCells 100000;
+    maxGlobalCells 2000000;
+    minRefinementCells 10;
+    maxLoadUnbalance 0.10;
+    nCellsBetweenLevels 3;
+
+    features
+    (
+        {
+            file "dtc_hull.eMesh";
+            level 2; // Reduced from 6 for rapid verification
+        }
+    );
+
+    refinementSurfaces
+    {
+        hull
+        {
+            // Reduced to Level 2 (approx 0.25m cells depending on base)
+            // Tutorial used Level 0, but 1-2 is safer for 6DoF stability.
+            level (2 2); 
+        }
+    }
+
+    resolveFeatureAngle 30;
+
+    refinementRegions
+    {
+        hull
+        {
+            mode distance;
+            levels ((1.0 2) (2.0 1)); // Reduced levels
+        }
+    }
+
+    locationInMesh (3.0 -3.0 0.5); 
+    allowFreeStandingZoneFaces true;
+}
+
+snapControls
+{
+    nSmoothPatch 3;
+    tolerance 2.0;
+    nSolveIter 30;
+    nRelaxIter 5;
+    nSmoothSurfaceNormals 1;
+    nSmoothNormals 3;
+    nSmoothThickness 10;
+    maxFaceThicknessRatio 0.5;
+    maxThicknessToMedialRatio 0.3;
+    minMedialAxisAngle 90;
+    nBufferCellsNoExtrude 0;
+    nLayerIter 50;
+    nRelaxedIter 20;
+}
+
+meshQualityControls
+{
+    #include "meshQualityDict"
+}
+
+debug 0;
+mergeTolerance 1E-6;
+
+// ************************************************************************* //
