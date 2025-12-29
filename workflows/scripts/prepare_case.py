@@ -184,6 +184,9 @@ def prepare_case(toml_path: Path, output_dir: Path):
     else:
         logging.warning(f"Geometry file for {case_name} not found in case dir or config/geometry.")
     
+    # Logic to remove setFieldsDict if waves are enabled? 
+    # (Removed suppression: We now provide a valid setFieldsDict for stokes_wave)
+
     # Generate Allrun script (Jinja2 template based)
     allrun_path = output_dir / "Allrun"
     allrun_template_path = templates_root / "scripts" / "Allrun.j2"
@@ -214,6 +217,20 @@ def prepare_case(toml_path: Path, output_dir: Path):
         allrun_path.chmod(0o755)
         logging.info(f"Created Allrun script from template at {allrun_path}")
 
+    # Overrides from case directory: Copy system/ and constant/ files if they exist in valid case source
+    case_dir = toml_path.parent
+    if (case_dir / "system").exists():
+        shutil.copytree(case_dir / "system", output_dir / "system", dirs_exist_ok=True)
+        logging.info(f"Applied system overrides from {case_dir}/system")
+    if (case_dir / "constant").exists():
+        shutil.copytree(case_dir / "constant", output_dir / "constant", dirs_exist_ok=True)
+        logging.info(f"Applied constant overrides from {case_dir}/constant")
+    if (case_dir / "0.orig").exists():
+        if (output_dir / "0.orig").exists():
+             shutil.rmtree(output_dir / "0.orig") # Replace entirely to avoid mixing
+        shutil.copytree(case_dir / "0.orig", output_dir / "0.orig")
+        logging.info(f"Applied 0.orig overrides from {case_dir}/0.orig")
+        
     logging.info(f"Case preparation complete: {output_dir}")
 
 if __name__ == "__main__":

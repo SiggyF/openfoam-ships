@@ -12,10 +12,10 @@ meshing = false
 waves = true
 
 [parameters]
-endTime = 10.0
-maxCo = 0.65
-maxAlphaCo = 0.65
-writeInterval = 0.5
+endTime = 5.0
+maxCo = 1.0
+maxAlphaCo = 1.0
+writeInterval = 0.05
 mass = 1.0
 CoM = "(0 0 0)"
 MoI = "(1 1 1)"

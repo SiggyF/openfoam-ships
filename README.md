@@ -42,6 +42,11 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 
 *> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
 
+### Verification Strategy
+For local verification on standard hardware, we utilize **reduced mesh refinement levels** (Level 2-3) compared to production HPC runs. This keeps cell counts manageable (~100k-300k) and allows for rapid feedback cycles (<10 minutes).
+- `wigley`: ~100k cells (Level 2/3)
+- `dtc`: ~200k cells (Level 2) - **Note**: Standard tutorials may use coarser or finer meshes; Level 2 is chosen for a balance of speed and 6DoF stability.
+
 ### Standard Tutorials (Benchmarks)
 We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.
 
