@@ -35,7 +35,7 @@ def load_data(filepath):
         raise FileNotFoundError(f"Results file not found: {filepath}")
     return pd.read_csv(filepath)
 
-def calculate_coefficients(df, scale=SCALE):
+def calculate_coefficients(df, scale=1.0):
     """Calculate non-dimensional coefficients (Ct, Fn) if not present."""
     # Assuming df has 'velocity' (m/s) and 'force_x' (N)
     
