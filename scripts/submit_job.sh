@@ -40,6 +40,8 @@ apptainer exec --bind /scratch:/scratch "$SOLVER_IMAGE" /bin/bash -c "source /op
 # Run Data Extraction
 # We use the python-extract image to generate CSVs
 echo "Starting Data Extraction..."
-apptainer exec --bind /scratch:/scratch "$EXTRACT_IMAGE" /bin/bash -c "cd $CASE_DIR && python3 extract_data.py"
+# We assume the project root contains scripts/extract_results.py
+# Since we cd into $CASE_DIR (e.g. cases/dtc), the script is at ../../scripts/extract_results.py
+apptainer exec --bind /scratch:/scratch "$EXTRACT_IMAGE" /bin/bash -c "cd $CASE_DIR && python3 ../../scripts/extract_results.py ."
 
 echo "Job Complete."
