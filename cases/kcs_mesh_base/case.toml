@@ -1,0 +1,20 @@
+[meta]
+name = "kcs_mesh_base"
+description = "KRISO Container Ship (KCS) resistance test."
+version = "of13"
+
+[parameters]
+endTime = 0.5
+velocity = 2.196
+maxCo = 0.8
+writeInterval = 0.5
+mass = 320.0
+CoM = "(0 0 0)"
+MoI = "(200 1000 200)"
+scale = 0.0227
+length = 7.27
+
+[flags.features]
+six_dof = false
+forces = true
+probes = true

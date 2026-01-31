@@ -192,3 +192,12 @@ tutorials/*/*/processor*/
 tutorials/*/*/postProcessing/
 cases/**/waveProperties # If generated or large
 
+
+# Generated simulation cases
+cases/dtc_esi*/
+cases/dtc_fr*/
+cases/kcs_benchmark/
+benchmarks/
+scripts/regenerate_forces.py
+examples/
+

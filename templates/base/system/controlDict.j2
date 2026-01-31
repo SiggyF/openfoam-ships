@@ -2,7 +2,7 @@
 {% set foam_object = 'controlDict' %}
 {% include 'header.j2' %}
 
-application     interFoam;
+application     incompressibleVoF;
 maxClockTime    {{ parameters.get('maxClockTime', 120) }};
 
 startFrom       startTime;
@@ -33,7 +33,7 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-adjustTimeStep  yes;
+adjustTimeStep  {{ parameters.get('adjustTimeStep', 'yes') }};
 
 maxCo           {{ parameters.get('maxCo', 0.9) }};
 maxAlphaCo      {{ parameters.get('maxAlphaCo', 2.0) }};

@@ -20,10 +20,10 @@ addLayers       false; // Disable layers for speed in verification
 
 geometry
 {
-    "kcs_hull.stl"
+    "kcs_mesh_base.stl"
     {
         type triSurfaceMesh;
-        file "kcs_hull.stl";
+        file "kcs_mesh_base.stl";
         name hull;
     }
 }
@@ -39,7 +39,7 @@ castellatedMeshControls
     features
     (
         {
-            file "kcs_hull.eMesh";
+            file "kcs_mesh_base.eMesh";
             level 2; // Reverted to 2
         }
     );

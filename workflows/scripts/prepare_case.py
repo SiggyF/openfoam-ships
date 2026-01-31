@@ -161,14 +161,17 @@ def prepare_case(toml_path: Path, output_dir: Path):
     geometry_dir = output_dir / "constant" / "triSurface"
     geometry_dir.mkdir(parents=True, exist_ok=True)
     
+    # Determine geometry filename
+    geo_name = meta.get("geometry_name", case_name)
+
     # Check for compressed or uncompressed source
-    source_stl = toml_path.parent / f"{case_name}.stl"
-    source_stl_gz = toml_path.parent / f"{case_name}.stl.gz"
+    source_stl = toml_path.parent / f"{geo_name}.stl"
+    source_stl_gz = toml_path.parent / f"{geo_name}.stl.gz"
     
     # Fallback to config/geometry if not in case dir
     if not source_stl.exists() and not source_stl_gz.exists():
-         source_stl = repo_root / "config" / "geometry" / f"{case_name}.stl"
-         source_stl_gz = repo_root / "config" / "geometry" / f"{case_name}.stl.gz"
+         source_stl = repo_root / "config" / "geometry" / f"{geo_name}.stl"
+         source_stl_gz = repo_root / "config" / "geometry" / f"{geo_name}.stl.gz"
 
     target_stl = geometry_dir / f"{case_name}.stl"
 

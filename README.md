@@ -37,7 +37,7 @@ This repository contains validation test cases for OpenFOAM ship hydrodynamics, 
 | **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated (Math) | [Wigley (1942)](https://doi.org/10.5957/attc-1942-016) |
 | **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (Proxy*) | [el Moctar et al. (2012)](https://doi.org/10.1080/09377255.2012.701315) |
 | **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
-| **`series60`** | Series 60 Hull (L=2.4m). | `forces` | `barge.stl` (Proxy*) | [Todd (1963)](https://apps.dtic.mil/sti/citations/AD0430632) |
+| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
 | **`DTCHullWave`** | Unmodified tutorial case. | `interFoam`, `wave` | `DTCHull.stl` | OpenFOAM Tutorial |
 
 *> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
@@ -65,6 +65,24 @@ The following table summarizes the runtime performance of standard tutorials on 
 > **Runtime Limits**: The `maxClockTime` setting applies **only to the solver** (hydrodynamics), excluding meshing time.
 > **Limit Enforcement**: OpenFOAM 13 tutorials did not consistently honor this limit. ESI `DTCHullMoving` exceeded it (380s > 120s) but completed.
 > **Mesh Dependencies**: OF13 tutorials re-ran meshing due to Docker mount isolation, significantly increasing total script time, but this is excluded from the "Solver Wall Time" reported above.
+
+
+### Tutorial Comparison: ESI vs Foundation
+
+We commonly reference the **DTC Hull** tutorial. Note the following differences between versions:
+
+| Feature | OpenFOAM ESI (v2406) | OpenFOAM Foundation (v13) |
+| :--- | :--- | :--- |
+| **Geometry File** | `DTC-scaled.stl.gz` (Distinct Mesh) | `DTC-scaled.stl.gz` (Distinct Mesh) |
+| **Geometry Hash** | `39120c...` (Verified Match) | `010497...` (Verified Match) |
+| **Meshing Strategy** | Explicit `refineMesh` loop (6x) + `snappyHexMesh` | `blockMesh` + `snappyHexMesh` (via `Allmesh`) |
+| **Refinement** | Uses `topoSet` for targeted refinement regions | Standard `snappyHexMesh` refinement |
+
+> **Clarification on Mesh Refinement**:
+> Contrary to the assumption that tutorials do not use refinement, both versions **do** refine the mesh.
+> - **ESI** uses an explicit `refineMesh` loop based on `topoSet` to refine the background mesh *before* snappy.
+> - **Foundation** relies on `snappyHexMesh`'s internal refinement controls (`castellatedMeshControls`).
+> - **Our Workflow**: We use `snappyHexMesh` refinement (Level 2-3) similar to the Foundation approach, but optimized for runtime.
 
 
 ## Adding a New Case

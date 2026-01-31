@@ -5,6 +5,7 @@ name = "dtc_hull"
 
 description = "Duisburg Test Case (DTC) hull benchmark."
 version = "of13"
+geometry_name = "dtc_hull_of13"
 
 [flags]
 [flags.features]

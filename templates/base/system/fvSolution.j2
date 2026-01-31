@@ -20,6 +20,24 @@ solvers
         minIter         1;
     }
 
+    "cellDisplacement.*"
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-06;
+        relTol          0;
+        maxIter         100;
+    }
+
+    // Required for wallDist Poisson method
+    yPsi
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-05;
+        relTol          0;
+    }
+
     "pcorr.*"
     {
         solver          PCG;
@@ -68,13 +86,17 @@ PIMPLE
     nNonOrthogonalCorrectors 0;
 
     maxCo               10;
-    maxAlphaCo          5;
+    maxAlphaCo          1;
 
     rDeltaTSmoothingCoeff 0.05;
     rDeltaTDampingCoeff 0.5;
     nAlphaSpreadIter    0;
     nAlphaSweepIter     0;
     maxDeltaT           1;
+
+    correctPhi          yes;
+    moveMeshOuterCorrectors yes;
+    transportCorrectionFinal yes;
 }
 
 relaxationFactors

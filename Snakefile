@@ -32,7 +32,7 @@ rule run_case:
     input:
         case_dir = BUILD_DIR / "{case_name}"
     output:
-        log = RESULTS_DIR / "{case_name}" / "log.interFoam"
+        log = RESULTS_DIR / "{case_name}" / "log.foamRun"
     params:
         image = "openfoam-ships:latest",
         results_root = lambda wc: str(RESULTS_DIR / wc.case_name)
@@ -61,7 +61,7 @@ rule run_case:
 
 rule visualize:
     input:
-        log = RESULTS_DIR / "{case_name}" / "log.interFoam",
+        log = RESULTS_DIR / "{case_name}" / "log.foamRun",
         script = "workflows/scripts/visualize.py"
     output:
         png = RESULTS_DIR / "{case_name}" / "visualization.png"
