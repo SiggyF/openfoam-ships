@@ -11,7 +11,7 @@ cp -r 0.orig 0
 # Scale Geometry
 {% if scale %}
 echo 'Scaling geometry by factor {{ scale }}...'
-surfaceTransformPoints "scale=({{ scale }} {{ scale }} {{ scale }})" constant/triSurface/{{ case_name }}.stl constant/triSurface/{{ case_name }}_scaled.stl > log.surfaceTransformPoints 2>&1
+surfaceTransformPoints -scale "({{ scale }} {{ scale }} {{ scale }})" constant/triSurface/{{ case_name }}.stl constant/triSurface/{{ case_name }}_scaled.stl > log.surfaceTransformPoints 2>&1
 mv constant/triSurface/{{ case_name }}_scaled.stl constant/triSurface/{{ case_name }}.stl
 {% endif %}
 
@@ -67,7 +67,7 @@ echo 'Running decomposePar...'
 decomposePar > log.decomposePar 2>&1
 echo 'Running foamRun (parallel)...'
 nProcs=$(grep 'numberOfSubdomains' system/decomposeParDict | tr -cd '0-9')
-mpirun -np $nProcs foamRun -solver incompressibleVoF -parallel > log.foamRun 2>&1
+mpirun --oversubscribe -np $nProcs foamRun -solver incompressibleVoF -parallel > log.foamRun 2>&1
 echo 'Running reconstructPar...'
 reconstructPar > log.reconstructPar 2>&1
 {% else %}

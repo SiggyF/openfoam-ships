@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+# Serial execution verification
+echo "Running in serial mode..."
+
+# Solver Execution
+echo 'Running interFoam (serial)...'
+interFoam > log.interFoam 2>&1

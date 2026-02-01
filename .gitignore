@@ -201,3 +201,4 @@ benchmarks/
 scripts/regenerate_forces.py
 examples/
 
+.cluster.env

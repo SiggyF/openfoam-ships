@@ -1,111 +1,87 @@
 # OpenFOAM Ships Test Repository
 
-This repository contains validation test cases for OpenFOAM ship hydrodynamics, orchestrated by **Snakemake** and running in **Docker** containers.
+This repository contains validation test cases for OpenFOAM ship hydrodynamics, running in **Docker** containers on local machines or HPC clusters.
+
+**Standard Version**: OpenFOAM ESI (v2506)
 
 ## Architecture
 
-- **Dependency Management**: `uv` handles Python dependencies (`snakemake`, `pyvista`, etc.).
+- **Dependency Management**: `uv` handles Python dependencies.
 - **Configuration**: Test cases are defined in `cases/**/*.toml`.
-- **Case Generation**: A Jinja2-based templating system (`prepare_case.py`) generates OpenFOAM `system/` and `constant/` files from base configurations and feature flags (e.g., `six_dof`, `waves`).
-- **Execution**: Simulations run in Docker containers (`openfoam/openfoam13-graphical` or `opencfd/openfoam-default:2406`).
+- **Execution**: Simulations run in Docker containers (converted to Apptainer on HPC).
+    - **Solver**: `siggyf/openfoam-ships-solver:latest` (OpenFOAM v2506)
+    - **Extraction**: `siggyf/openfoam-ships-extract:latest` (Python 3.13)
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/)
+- [Docker](https://www.docker.com/) (Local)
 - [uv](https://github.com/astral-sh/uv)
 
-### Running the Workflow
+### Running Locally
 
 1. **Install Dependencies**:
    ```bash
    uv sync
    ```
 
-2. **Run All Test Cases**:
+2. **Run Test Cases**:
    ```bash
    uv run snakemake --cores all
    ```
 
+## HPC Execution
+
+We rely on **Apptainer** (formerly Singularity) to run Docker images on HPC systems.
+
+### 1. Configuration
+Copy the template and configure your cluster details (username, partition, etc.):
+```bash
+cp cluster.env.template .cluster.env
+# Edit .cluster.env with your credentials
+```
+
+### 2. Workflow
+The workflow consists of four steps:
+
+**Step A: Sync Project**
+Upload code and configuration to the cluster scratch directory.
+```bash
+./scripts/sync_to_hpc.sh
+```
+
+**Step B: Pull Containers**
+Pull Docker images and convert them to `.sif` files on the cluster.
+```bash
+./scripts/pull_containers.sh
+```
+
+**Step C: Run Job**
+Submit a simulation job. The wrapper script ensures correct partitions and accounts are used.
+```bash
+./scripts/run_job.sh cases/dtc_test
+```
+
+**Step D: Download Results**
+Download only the analysis results (CSV, PNG, logs) back to your local machine.
+```bash
+./scripts/download_results.sh
+```
+
 ## Available Test Cases
 
-| Case | Description | Features | Geometry Source | Reference |
-| :--- | :--- | :--- | :--- | :--- |
-| **`empty_tank`** | Basic domain validation. | `interFoam`, `blockMesh`, `no-mesh` | None (Box) | N/A |
-| **`stokes_wave`** | ESI tutorial-based wave test. | `interFoam`, `waves` | None (Box) | Stokes I Theory |
-| **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated (Math) | [Wigley (1942)](https://doi.org/10.5957/attc-1942-016) |
-| **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` (Proxy*) | [el Moctar et al. (2012)](https://doi.org/10.1080/09377255.2012.701315) |
-| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
-| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` (Proxy*) | [SIMMAN 2008](http://www.simman2008.dk/KCS/kcs_geometry.htm) |
-| **`DTCHullWave`** | Unmodified tutorial case. | `interFoam`, `wave` | `DTCHull.stl` | OpenFOAM Tutorial |
-
-*> **Note on Geometry Proxies**: Due to licensing/distribution limits, some cases currently use placeholder geometries from `jax-vessels` that approximate the hull form for workflow validation.*
-
-### Verification Strategy
-For local verification on standard hardware, we utilize **reduced mesh refinement levels** (Level 2-3) compared to production HPC runs. This keeps cell counts manageable (~100k-300k) and allows for rapid feedback cycles (<10 minutes).
-- `wigley`: ~100k cells (Level 2/3)
-- `dtc`: ~200k cells (Level 2) - **Note**: Standard tutorials may use coarser or finer meshes; Level 2 is chosen for a balance of speed and 6DoF stability.
-
-### Standard Tutorials (Benchmarks)
-We benchmark standard OpenFOAM tutorials for both Foundation (v11/v13) and ESI (v2406) versions to evaluate runtime performance.
-
-The following table summarizes the runtime performance of standard tutorials on a reference machine (e.g., Apple M1/M2/M3). Simulations were run for **5 seconds** of simulation time.
-
-| Tutorial Name | OpenFOAM Version | Simulated Time | Solver Wall Time | Extrapolated (5s) | Cores | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DTCHull** | ESI (v2406) | 5.0s | 8s | 8s | 8 | Fast (LTS) |
-| **DTCHull** | Foundation (v13) | 5.0s | 11s | 11s | 8 | Fast (LTS) |
-| **DTCHullMoving** | ESI (v2406) | 5.0s | 380s | 380s | 8 | Completed |
-| **DTCHullMoving** | Foundation (v13) | 1.86s | ~670s (Killed) | ~2400s | 8 | Slow (Limit failed) |
-| **rigidBodyHull** | ESI (v2406) | 0.05s | ~360s (Killed) | ~36000s | 5 | Slow (Limit ineffective until writeInterval) |
-| **DTCHullWave** | Foundation (v13) | 0.02s | ~150s (Killed) | ~37500s | 8 | Limit ignored, extremely slow |
-
-> [!NOTE]
-> **Runtime Limits**: The `maxClockTime` setting applies **only to the solver** (hydrodynamics), excluding meshing time.
-> **Limit Enforcement**: OpenFOAM 13 tutorials did not consistently honor this limit. ESI `DTCHullMoving` exceeded it (380s > 120s) but completed.
-> **Mesh Dependencies**: OF13 tutorials re-ran meshing due to Docker mount isolation, significantly increasing total script time, but this is excluded from the "Solver Wall Time" reported above.
-
-
-### Tutorial Comparison: ESI vs Foundation
-
-We commonly reference the **DTC Hull** tutorial. Note the following differences between versions:
-
-| Feature | OpenFOAM ESI (v2406) | OpenFOAM Foundation (v13) |
-| :--- | :--- | :--- |
-| **Geometry File** | `DTC-scaled.stl.gz` (Distinct Mesh) | `DTC-scaled.stl.gz` (Distinct Mesh) |
-| **Geometry Hash** | `39120c...` (Verified Match) | `010497...` (Verified Match) |
-| **Meshing Strategy** | Explicit `refineMesh` loop (6x) + `snappyHexMesh` | `blockMesh` + `snappyHexMesh` (via `Allmesh`) |
-| **Refinement** | Uses `topoSet` for targeted refinement regions | Standard `snappyHexMesh` refinement |
-
-> **Clarification on Mesh Refinement**:
-> Contrary to the assumption that tutorials do not use refinement, both versions **do** refine the mesh.
-> - **ESI** uses an explicit `refineMesh` loop based on `topoSet` to refine the background mesh *before* snappy.
-> - **Foundation** relies on `snappyHexMesh`'s internal refinement controls (`castellatedMeshControls`).
-> - **Our Workflow**: We use `snappyHexMesh` refinement (Level 2-3) similar to the Foundation approach, but optimized for runtime.
-
-
-## Adding a New Case
-
-1. Create a new directory in `cases/`.
-2. Add a `case.toml` file:
-   ```toml
-   [meta]
-   name = "my_new_case"
-   version = "of13"
-
-   [flags]
-   [flags.features]
-   six_dof = true
-   
-   [parameters]
-   maxCo = 0.5
-   ```
-3. Run `snakemake` again.
+| Case | Description | Features | Geometry Source |
+| :--- | :--- | :--- | :--- |
+| **`stokes_wave`** | ESI tutorial-based wave test. | `interFoam`, `waves` | Box |
+| **`wigley`** | Wigley hull (L=1m). | `sixDoF`, `snappyHexMesh` | Generated |
+| **`dtc`** | Duisburg Test Case (L=3.0m). | `sixDoF`, `probes` | `tanker.stl` |
+| **`kcs`** | KRISO Container Ship (L=7.3m). | `forces`, `probes` | `tanker_kvlcc2.stl` |
 
 ## Folder Structure
 
 - `cases/`: TOML definitions.
-- `config/`: Base OpenFOAM templates (OF13, OF2406) and feature includes.
-- `docker/`: Dockerfiles.
-- `workflows/`: Snakemake rules and scripts.
+- `docker/`: Dockerfiles for Solver and Extractor.
+- `scripts/`: HPC utility scripts (`sync`, `pull`, `run`, `download`).
+- `config/`: Base OpenFOAM templates.
+- `workflows/`: Snakemake rules.

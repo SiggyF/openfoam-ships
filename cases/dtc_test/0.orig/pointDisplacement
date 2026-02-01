@@ -9,19 +9,42 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      turbulenceProperties;
+    class       pointVectorField;
+    object      pointDisplacement;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType      laminar;
+dimensions      [0 1 0 0 0 0 0];
 
-// RAS
-// {
-//     RASModel        kOmegaSST;
-//     turbulence      on;
-//     printCoeffs     on;
-// }
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    inlet
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    outlet
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    atmosphere
+    {
+        type            fixedValue;
+        value           uniform (0 0 0);
+    }
+
+    hull
+    {
+        type            calculated;
+    }
+}
 
 
 // ************************************************************************* //

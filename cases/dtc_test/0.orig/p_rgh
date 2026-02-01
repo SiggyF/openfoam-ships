@@ -9,19 +9,42 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      turbulenceProperties;
+    class       volScalarField;
+    object      p_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType      laminar;
+dimensions      [1 -1 -2 0 0 0 0];
 
-// RAS
-// {
-//     RASModel        kOmegaSST;
-//     turbulence      on;
-//     printCoeffs     on;
-// }
+internalField   uniform 0;
+
+boundaryField
+{
+    #includeEtc "caseDicts/setConstraintTypes"
+
+    inlet
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+
+    outlet
+    {
+        type            zeroGradient;
+    }
+
+    atmosphere
+    {
+        type            totalPressure;
+        p0              uniform 0;
+    }
+
+    hull
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+}
 
 
 // ************************************************************************* //
