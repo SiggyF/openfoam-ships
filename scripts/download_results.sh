@@ -12,7 +12,7 @@ else
     exit 1
 fi
 
-echo "Downloading results from ${HPC_HOST:-delftblue}..."
+echo "Downloading results from ${HPC_HOST:-your_cluster}..."
 
 # Download only CSV and PNG files from the remote directory
 # We exclude everything else to save bandwidth

@@ -12,7 +12,7 @@ else
     exit 1
 fi
 
-echo "Pulling containers on ${HPC_HOST:-delftblue}..."
+echo "Pulling containers on ${HPC_HOST:-your_cluster}..."
 
 # We use ssh to run the pull commands on the cluster
 # We use single long command string with double quotes for local expansion
