@@ -4,7 +4,7 @@
 #SBATCH --error=logs/slurm-%j.err
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=2G
 #SBATCH --partition=generic # Overridden by run_job.sh
 #SBATCH --account=generic   # Overridden by run_job.sh

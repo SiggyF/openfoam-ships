@@ -6,12 +6,16 @@ solvers
 {
     "alpha.water.*"
     {
+        nAlphaCorr      2;
+        nAlphaSubCycles 1;
         nCorrectors     2;
         nSubCycles      1;
         
         MULESCorr       yes;
         nLimiterIter    10;
         alphaApplyPrevCorr  yes;
+
+        cAlpha          1;
 
         solver          smoothSolver;
         smoother        symGaussSeidel;

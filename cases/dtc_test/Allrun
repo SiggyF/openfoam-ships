@@ -1,69 +1,9 @@
 #!/bin/bash
 set -e
 
-# Restoring 0 directory (Initial)
-
-echo 'Restoring 0 directory...'
-rm -rf 0
-cp -r 0.orig 0
-
-
-# Scale Geometry
-
-echo 'Scaling geometry by factor 1.0...'
-surfaceTransformPoints "scale=(1.0 1.0 1.0)" constant/triSurface/dtc_test.stl constant/triSurface/dtc_test_scaled.stl > log.surfaceTransformPoints 2>&1
-mv constant/triSurface/dtc_test_scaled.stl constant/triSurface/dtc_test.stl
-
-
-# Check for existing mesh
-if [ -f "constant/polyMesh/points" ] && [ -f "constant/polyMesh/boundary" ]; then
-    echo "Existing mesh detected in constant/polyMesh. Skipping mesh generation steps."
-    mesh_exists=true
-else
-    mesh_exists=false
-fi
-
-# BlockMesh
-
-if [ "$mesh_exists" = false ]; then
-    echo 'Running blockMesh...'
-    blockMesh > log.blockMesh 2>&1
-fi
-
-
-# Meshing (Surface Features + Snappy)
-
-if [ "$mesh_exists" = false ]; then
-    # Surface Features
-    
-    echo 'Running surfaceFeatures...'
-    surfaceFeatures > log.surfaceFeatures 2>&1
-    
-
-    echo 'Running snappyHexMesh...'
-    snappyHexMesh -overwrite > log.snappyHexMesh 2>&1
-
-    # Restore 0 directory (Post-Meshing) to ensure fields match new mesh
-    
-    echo 'Restoring 0 directory after meshing...'
-    rm -rf 0
-    cp -r 0.orig 0
-    
-fi
-
-
-# SetFields
-
-echo 'Running setFields...'
-setFields > log.setFields 2>&1
-
+# Serial execution verification
+echo "Running in serial mode..."
 
 # Solver Execution
-
-echo 'Running decomposePar...'
-decomposePar > log.decomposePar 2>&1
-echo 'Running foamRun (parallel)...'
-nProcs=$(grep 'numberOfSubdomains' system/decomposeParDict | tr -cd '0-9')
-mpirun -np $nProcs foamRun -solver incompressibleVoF -parallel > log.foamRun 2>&1
-echo 'Running reconstructPar...'
-reconstructPar > log.reconstructPar 2>&1
+echo 'Running interFoam (serial)...'
+interFoam > log.interFoam 2>&1

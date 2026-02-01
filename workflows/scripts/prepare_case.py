@@ -108,8 +108,9 @@ def prepare_case(toml_path: Path, output_dir: Path):
     turb_props = output_dir / "constant" / "turbulenceProperties"
     mom_transport = output_dir / "constant" / "momentumTransport"
     if turb_props.exists() and not mom_transport.exists():
-        turb_props.rename(mom_transport)
-        logging.info("Renamed turbulenceProperties -> momentumTransport for OF13 compatibility")
+        # turb_props.rename(mom_transport)
+        # logging.info("Renamed turbulenceProperties -> momentumTransport for OF13 compatibility")
+        pass
 
     # Patch decomposeParDict (Moved to template)
     pass

@@ -30,6 +30,10 @@ rsync -avz \
     --exclude='logs' \
     --exclude='processor*' \
     --exclude='.venv' \
+    --exclude='.vscode' \
+    --exclude='.snakemake' \
+    --exclude='__pycache__' \
+    --exclude='results' \
     "$@" \
     . \
     "${REMOTE_HOST}:${REMOTE_DIR}"

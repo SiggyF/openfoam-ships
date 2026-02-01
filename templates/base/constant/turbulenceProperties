@@ -14,16 +14,14 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType      RAS;
+simulationType      laminar;
 
-RAS
-{
-    RASModel        kOmegaSST;
-
-    turbulence      on;
-
-    printCoeffs     on;
-}
+// RAS
+// {
+//     RASModel        kOmegaSST;
+//     turbulence      on;
+//     printCoeffs     on;
+// }
 
 
 // ************************************************************************* //
