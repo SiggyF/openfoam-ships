@@ -17,12 +17,10 @@
 
 # Variables
 CASE_DIR=$1
-# Default images (Can be overridden by exporting variables before sbatch, 
-# but easier to change here or via sed if needed. For now, removing hardcoded user).
-# Ideally, these should be passed in or set in a config file derived container setup.
-# Reverting to placeholders that MUST be updated or injected.
-SOLVER_IMAGE="${HPC_SOLVER_IMAGE:-docker://username/openfoam-ships-solver:latest}"
-EXTRACT_IMAGE="${HPC_EXTRACT_IMAGE:-docker://username/openfoam-ships-extract:latest}"
+# Default images (Expecting SIF files in project root, or passed via env)
+# We default to local SIF files because compute nodes cannot pull from Docker Hub
+SOLVER_IMAGE="${HPC_SOLVER_IMAGE:-solver.sif}"
+EXTRACT_IMAGE="${HPC_EXTRACT_IMAGE:-extract.sif}"
 
 if [ -z "$CASE_DIR" ]; then
     echo "Usage: sbatch submit_job.sh <case_dir>"
@@ -36,7 +34,7 @@ mkdir -p logs
 
 # Run OpenFOAM Solver
 echo "Starting Solver..."
-apptainer exec --bind /scratch:/scratch "$SOLVER_IMAGE" /bin/bash -c "source /opt/openfoam2312/etc/bashrc && cd $CASE_DIR && ./Allrun"
+apptainer exec --bind /scratch:/scratch "$SOLVER_IMAGE" /bin/bash -c "source /usr/lib/openfoam/openfoam2512/etc/bashrc && cd $CASE_DIR && ./Allrun"
 
 # Run Data Extraction
 # We use the python-extract image to generate CSVs

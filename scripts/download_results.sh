@@ -16,7 +16,7 @@ echo "Downloading results from ${HPC_HOST:-your_cluster}..."
 
 # Download only CSV and PNG files from the remote directory
 # We exclude everything else to save bandwidth
-rsync -avz --include='OPTIONS' --include='*/' --include='*.csv' --include='*.png' --exclude='*' \
+rsync -avzm --include='*/' --include='*.csv' --include='*.png' --include='*.log' --include='slurm-*.out' --include='slurm-*.err' --exclude='*' \
     "${HPC_HOST:?HPC_HOST not set}:${HPC_REMOTE_DIR}/" \
     results/
 

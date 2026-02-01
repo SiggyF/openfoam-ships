@@ -72,18 +72,18 @@ def prepare_case(toml_path: Path, output_dir: Path):
     # - decomposeParDict.j2
     # - U.j2
     
-    # Generate surfaceFeaturesDict (OF13 compatibility)
-    surf_feat_template_path = templates_root / "scripts" / "surfaceFeaturesDict.template"
+    # Generate surfaceFeatureExtractDict (ESI compatibility)
+    surf_feat_template_path = templates_root / "scripts" / "surfaceFeatureExtractDict.template"
     if surf_feat_template_path.exists() and case_name and features.get("meshing", True):
         with open(surf_feat_template_path, "r") as f:
             template_content = f.read()
         
-        rendered = template_content.replace("{stl_filename}", f"{case_name}.stl")
+        rendered = template_content.replace("{stl_filename}", f"{case_name}")
         
-        surf_feat_dict = output_dir / "system" / "surfaceFeaturesDict"
+        surf_feat_dict = output_dir / "system" / "surfaceFeatureExtractDict"
         with open(surf_feat_dict, "w") as f:
             f.write(rendered)
-        logging.info(f"Generated surfaceFeaturesDict from template")
+        logging.info(f"Generated surfaceFeatureExtractDict from template")
 
     # Remove legacy dict
     legacy_dict = output_dir / "system" / "surfaceFeatureExtractDict"

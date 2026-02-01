@@ -25,4 +25,8 @@ echo "  Account:   ${HPC_ACCOUNT}"
 
 # Submit using sbatch, overriding script defaults with config values
 # Note: Command line arguments override #SBATCH directives in the script
-ssh "${HPC_HOST:?HPC_HOST not set in .cluster.env}" "cd ${HPC_REMOTE_DIR} && sbatch --partition=${HPC_PARTITION} --account=${HPC_ACCOUNT} scripts/submit_job.sh ${CASE_DIR}"
+# We export the image paths to point to the local SIF files on the cluster
+ssh "${HPC_HOST:?HPC_HOST not set in .cluster.env}" "cd ${HPC_REMOTE_DIR} && \
+     export HPC_SOLVER_IMAGE=${HPC_REMOTE_DIR}/solver.sif && \
+     export HPC_EXTRACT_IMAGE=${HPC_REMOTE_DIR}/extract.sif && \
+     sbatch --partition=${HPC_PARTITION} --account=${HPC_ACCOUNT} scripts/submit_job.sh ${CASE_DIR}"
